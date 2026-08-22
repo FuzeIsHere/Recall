@@ -135,7 +135,3 @@ async def semantic_search(request: SearchRequest, verified_uid: str = Depends(ge
         raise HTTPException(status_code=500, detail="Internal index computation error.")
         
     return {"success": True, "noteIds": note_ids_output}
-
-if __name__ == "__main__":
-    import uvicorn
-    uvicorn.run("app:app", host="0.0.0.0", port=5000, reload=True)  # Set reload to false for singular clear load logs

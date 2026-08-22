@@ -82,6 +82,7 @@ const Dashboard = () => {
 		}
 
 		if(c_search === prevSearchRef.current.trim()) return;
+		prevSearchRef.current = c_search;
 
 		const searchFilter = {
 			query: c_search,
