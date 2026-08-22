@@ -1,8 +1,6 @@
 # 🧠 Recall
 
-A full-stack personal knowledge management application featuring GPU-accelerated semantic search and Firestore vector search.
-
----
+#### A full-stack personal knowledge management application featuring GPU-accelerated semantic search and Firestore vector search.
 
 ## 📺 Screenshots
 
@@ -14,7 +12,6 @@ A full-stack personal knowledge management application featuring GPU-accelerated
 | :---: | :---: |
 | ![Search Light](assets/search%20light.png) | ![Dashboard Dark](assets/dash%20dark.png) |
 | ![Viewer Dark](assets/viewer%20dark.png) | ![Editor Light](assets/editor%20light.png) |
----
 
 ## 📋 Table of Contents
 - [🔍 Overview](#-overview)
@@ -26,20 +23,20 @@ A full-stack personal knowledge management application featuring GPU-accelerated
 - [📊 Data Model](#-data-model)
 - [🔒 Authentication & Security](#-authentication--security)
 - [🚀 Performance](#-performance)
-- [⚙️ Installation](#️-installation)
+- [📋 Prerequisites](#-prerequisites)
+- [⚙️ Installation & Local Development](#️-installation--local-development)
+- [🔐 Environment Variables](#-environment-variables)
 - [💼 Usage](#-usage)
-- [🤝 Contributing](#-contributing)
+- [📐 Architectural Design Decisions](#-architectural-design-decisions)
+- [🚀 Deployment](#-deployment)
+- [🔮 Future Improvements](#-future-improvements)
 - [📄 License](#-license)
-
----
 
 ## 🔍 Overview
 
 **Recall** is a full-stack personal knowledge base optimized for storing, organizing, and deeply exploring personal notes. 
 
 Unlike traditional keyword-based matching, Recall translates the underlying context of your content using sentence embeddings and Firestore Vector Search to retrieve exact records based on their core **semantic meaning**.
-
----
 
 ## ✨ Key Features
 
@@ -55,7 +52,6 @@ Unlike traditional keyword-based matching, Recall translates the underlying cont
 * **GPU Pipeline:** Asynchronous embedding generation utilizing multiple processing workers.
 * **Traffic Throttling:** Smart backend embedding debounce and strict job deduplication.
 
----
 ## 🛠️ Tech Stack
 
 ### 🎨 Frontend
@@ -79,8 +75,6 @@ Unlike traditional keyword-based matching, Recall translates the underlying cont
 * **Identity Protocol:** Firebase Authentication
 * **NoSQL Catalog:** Cloud Firestore
 * **Search Engine:** Firestore Vector Search
-
----
 
 ## 🏗️ Architecture Overview
 
@@ -113,8 +107,6 @@ Acts as the central machine learning broker and state synchronization worker.
 * **AI Pipeline:** Generates query embeddings via machine learning models.
 * **Vector Operations:** Executes vector searches and filters results.
 * **Sync Engine:** Handles background synchronisation of note embeddings.
-
----
 
 ## 🔍 Semantic Search
 
@@ -167,8 +159,6 @@ Semantic search works by converting both notes and search queries into high-dime
 * **Distance Thresholds:** Employs Cosine-distance thresholding to ensure relevance.
 * **Concurrency Guard:** Manages multiple concurrent users through a thread-safe request queue.
 
----
-
 ## 🧵 Embedding Pipeline
 
 Embedding generation is performed asynchronously so that note updates do not block the frontend application.
@@ -213,8 +203,6 @@ The note content in database needs to be updated much quicker than embeddings ne
 * **Cooldown Period:** The backend therefore applies an additional cooldown before processing an embedding job.
 * **Job Deduplication:** If multiple updates arrive during this period, obsolete jobs are deduplicated.
 * **Efficiency First:** This deduplication ensures that embedding computation is primarily performed for the latest version of the note.
-
----
 
 ## 📊 Data Model
 
@@ -275,7 +263,7 @@ The note content in database needs to be updated much quicker than embeddings ne
 
 * **Separation of Concerns:** Embedding documents intentionally do not contain the complete note content because the frontend does not need embedding data when retrieving notes.
 * **Shared Identifiers:** The note and corresponding embedding use the same document ID, eliminating the need for a redundant `noteId` field.
----
+
 ## 🔒 Authentication & Security
 
 The frontend authenticates users using Firebase Authentication. Search requests send a Firebase ID token to the FastAPI backend.
@@ -307,8 +295,6 @@ The frontend authenticates users using Firebase Authentication. Search requests 
 * **Token-Derived Identity:** The backend does not trust a user-provided UID for tenant isolation.
 * **Cryptographic Verification:** The UID used for search filtering is obtained strictly from the verified Firebase token.
 
----
-
 ## 🚀 Performance
 
 Local embedding throughput bench-marked against text records:
@@ -321,51 +307,128 @@ Local embedding throughput bench-marked against text records:
 | Individual inference execution | ~50–70 notes/sec |
 | Vector batch mode streaming | ~700 notes/sec |
 
-> *Note: Metrics reflect local configurations and fluctuate based on token sequence size and hardware constraints.*
+> *Note: Metrics reflect local configurations and fluctuate based on text size and hardware constraints.*
 
----
+## 📋 Prerequisites
 
-## ⚙️ Installation
+Before setting up the project locally, ensure you have the following installed:
+* **Node.js** (v18+ recommended)
+* **Python 3.x**
+* **Firebase Project** (Firestore DB and Firebase Auth configured)
+* **NVIDIA GPU + CUDA** (Required for `all-MiniLM-L6-v2` GPU acceleration Otherwise Optional)
 
-### Setup Environment
+## ⚙️ Installation & Local Development
+
+### 1. Setup Environment & Clone
 ```bash
 # Clone the repository
-git clone https://github.com
+git clone https://github.com/FuzeIsHere/notes-app.git
 
 # Jump into project directory
 cd recall
 ```
 
-### Install Modules
+### 2. Frontend Setup
 ```bash
-# Setup Client UI Dependencies
-npm install
+# Navigate to the client directory
+cd client
 
-# Setup Engine Dependencies
+# Install client UI dependencies
+pnpm install
+```
+
+### 3. Backend Setup
+```bash
+# Navigate to the server directory from the root
+cd ../server
+
+# Create a virtual environment
+python -m venv venv
+
+# Activate the virtual environment
+# On Windows:
+venv\Scripts\activate
+# On Linux/macOS:
+source venv/bin/activate
+
+# Install Engine/Backend dependencies
 pip install -r requirements.txt
 ```
 
----
+## 🔐 Environment Variables
+
+Create `.env` files in their respective directories using the configurations below. **Never commit credentials, private keys, or service-account files to the repository.**
+
+### Frontend (`client/.env`)
+```env
+VITE_APP_NAME=Recall
+
+VITE_FIREBASE_API_KEY=your_firebase_api_key
+VITE_FIREBASE_AUTH_DOMAIN=your_firebase_auth_domain
+VITE_FIREBASE_PROJECT_ID=your_firebase_project_id
+VITE_FIREBASE_STORAGE_BUCKET=your_firebase_storage_bucket
+VITE_FIREBASE_MESSAGING_SENDER_ID=your_firebase_messaging_sender_id
+VITE_FIREBASE_APP_ID=your_firebase_app_id
+VITE_FIREBASE_MEASUREMENT_ID=your_firebase_measurement_id
+
+# Edit this in deployment
+VITE_SEARCH_API_URL=http://localhost:5000
+```
+
+### Backend (`server/.env`)
+```env
+# You will get this from your project in Firebase Console
+GOOGLE_APPLICATION_CREDENTIALS=./service-account-key.json
+```
 
 ## 💼 Usage
 
 ### Spin Up Client Workspace
 ```bash
-npm start
+cd client
+pnpm run dev
 ```
 
-### Launch Python Compute Engine
+### Launch Python Compute Engine & Servers
+The system runs via a FastAPI application server which spins up multiple dedicated background pipeline threads upon startup.
 ```bash
+cd server
+# Ensure your virtual environment is active
 python main.py
 ```
 
+## 📐 Architectural Design Decisions
+
+* **Why Firestore DB & Vector Index?**  
+  Used to orchestrate a unified backend document ecosystem. The frontend uses debounced CRUD operations to interact with Firebase, allowing the system to listen to downstream cloud changes seamlessly.
+* **Why an Asynchronous Background Sync Pipeline?**  
+  To keep the main web app non-blocking, a dedicated **Firestore Listener Thread** listens for cloud updates and pipes them down through a **3-second Embedding Debounce** filter for job deduplication.
+* **Why a Min-Heap Priority Queue?**  
+  Pending deduplicated embedding tasks are pushed into a Min-Heap priority arrangement. Multiple dedicated multi-threaded compute instances (**Embedding Worker 1 & Worker 2**) pop jobs and batch-write computed vectors directly into the database.
+* **Why a Thread-Safe Search Queue?**  
+  To handle concurrent query requests securely. When a user requests text matching, queries pass along a verified Firebase Auth UID. They enter a dedicated **Thread-Safe Search Queue** inside a decoupled **Background Search Pipeline** where queries are sequentially dequeued by a specialized **Search Worker Thread**.
+* **Why `all-MiniLM-L6-v2` with CUDA?**  
+  Selected as the central token processing model to generate dense text vector metrics natively on the GPU, maximizing local similarity query performance.
+
+## 🚀 Deployment
+
+### Frontend
+* **React Frontend Application** is optimized for distribution to static infrastructure networks (e.g., Firebase Hosting, Vercel).
+
+### Backend
+* **Uvicorn ASGI Web Server & FastAPI Engine** require deployment to compute environments offering persistent multi-threading and NVIDIA GPU compute runtimes (e.g., RunPod, AWS EC2 with GPU instances, or customized Docker stacks).
+
+### Database & Auth
+* **Firebase Cloud Services** handles native persistent data pipelines via Firestore DB and user token verification via Firebase Auth.
+
 ---
 
-## 🤝 Contributing
+## 🔮 Future Improvements
 
-Contributions are welcome! Please open an issue or submit a pull request for any changes.
-
----
+- RAG-based question answering over notes
+- Chunk-level embeddings for long notes
+- Improved search ranking
+- Additional note organization features
 
 ## 📄 License
 
