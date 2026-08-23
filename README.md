@@ -19,7 +19,7 @@
 - [🛠️ Tech Stack](#️-tech-stack)
 - [🏗️ Architecture Overview](#️-architecture-overview)
 - [🔍 Semantic Search](#-semantic-search)
-- [🧵 Embedding Pipeline](#-embedding-pipeline)
+- [🧵 Sync Pipeline](#-sync-pipeline)
 - [📊 Data Model](#-data-model)
 - [🔒 Authentication & Security](#-authentication--security)
 - [🚀 Performance](#-performance)
@@ -42,8 +42,8 @@ Unlike traditional keyword-based matching, Recall translates the underlying cont
 
 ### 🎨 Frontend Experience
 * **Rich-Text Editor:** Interactive editing engine powered by TipTap.
-* **Smart Folders:** Dynamic workflows for pinning, archiving, trashing, and restoring notes.
-* **Flexible Taxonomy:** Tagging and custom categories for quick groupings.
+* **Smart Folders:** Dynamic workflows for archiving, trashing, and restoring notes.
+* **Flexible Taxonomy:** Pinning and custom categories for quick groupings.
 * **Responsive Layout:** Fluid dark/light adaptive interfaces across mobile and desktop.
 
 ### 🧠 Semantic & Vector Search
@@ -101,10 +101,10 @@ Serves as the secure global data catalog and security gate.
 * **Data Isolation:** Secures user-scoped notes and embedding data.
 
 ### 🐍 3. Backend API (Python)
-Acts as the central machine learning broker and state synchronization worker.
+Acts as the central Semantic Search & Embedding state synchronization worker.
 * **Token Verification:** Unpacks and cryptographically checks incoming Firebase ID tokens.
 * **Traffic Control:** Schedules incoming search requests to prevent pipeline choking.
-* **AI Pipeline:** Generates query embeddings via machine learning models.
+* **AI Pipeline:** Generates query embeddings via machine learning model.
 * **Vector Operations:** Executes vector searches and filters results.
 * **Sync Engine:** Handles background synchronisation of note embeddings.
 
@@ -115,40 +115,40 @@ Semantic search works by converting both notes and search queries into high-dime
 ### 🔄 Search Pipeline
 
 ```text
-[ User Query ]
-       │
-       ▼
-[ React Frontend ]
-       │  (Debounced)
-       ▼
-[ FastAPI ]
-       │
-       ▼
+        [ User Query ]
+              │
+              ▼
+     [ React Frontend ]
+              │  (Debounced)
+              ▼
+         [ FastAPI ]
+              │
+              ▼
 [ Firebase ID Token Verification ]
-       │
-       ▼
-[ Thread-Safe Search Queue ]
-       │
-       ▼
-[ Search Worker ]
-       │
-       ▼
-[ Query Embedding ]
-       │
-       ▼
-[ Sentence Transformer ]
-       │
-       ▼
-[ Firestore Vector Search ]
-       │
-       ▼
-[ Filtering ]
-       │
-       ▼
-[ Matching Notes ]
-       │
-       ▼
-[ React Frontend ]
+              │
+              ▼
+  [ Thread-Safe Search Queue ]
+              │
+              ▼
+       [ Search Worker ]
+              │
+              ▼
+    [ Sentence Transformer ]
+              │
+              ▼
+      [ Query Embedding ]
+              │
+              ▼
+  [ Firestore Vector Search ]
+              │
+              ▼
+        [ Filtering ]
+              │
+              ▼
+      [ Matching Notes ]
+              │
+              ▼
+      [ React Frontend ]
 ```
 
 ### 🛠️ Core Capabilities
@@ -159,7 +159,7 @@ Semantic search works by converting both notes and search queries into high-dime
 * **Distance Thresholds:** Employs Cosine-distance thresholding to ensure relevance.
 * **Concurrency Guard:** Manages multiple concurrent users through a thread-safe request queue.
 
-## 🧵 Embedding Pipeline
+## 🧵 Sync Pipeline
 
 Embedding generation is performed asynchronously so that note updates do not block the frontend application.
 
@@ -198,7 +198,7 @@ Embedding generation is performed asynchronously so that note updates do not blo
 
 ### ⏱️ Backend Debouncing & Deduplication
 
-The note content in database needs to be updated much quicker than embeddings need to be calculated, to save our computer resources while also preventing data loss for user. Thus, the backend engine implements a structural safety layer:
+The note content in database needs to be updated much quicker than embeddings need to be calculated, to prevent data loss for user while also saving our computer resources. Thus, the backend engine implements a structural safety layer:
 
 * **Cooldown Period:** The backend therefore applies an additional cooldown before processing an embedding job.
 * **Job Deduplication:** If multiple updates arrive during this period, obsolete jobs are deduplicated.
@@ -269,24 +269,24 @@ The note content in database needs to be updated much quicker than embeddings ne
 The frontend authenticates users using Firebase Authentication. Search requests send a Firebase ID token to the FastAPI backend.
 
 ```text
-   [ React ]
-       │
-       ▼
-[ Firebase ID Token ]
-       │
-       ▼
-   [ FastAPI ]
-       │
-       ▼
- [ Verify Token ]
-       │
-       ▼
- [ Trusted UID ]
-       │
-       ▼
- [ Search Queue ]
-       │
-       ▼
+          [ React ]
+              │
+              ▼
+ [ Query + Firebase ID Token ]
+              │
+              ▼
+         [ FastAPI ]
+              │
+              ▼
+       [ Verify Token ]
+              │
+              ▼
+   [ Query + Trusted UID ]
+              │
+              ▼
+       [ Search Queue ]
+              │
+              ▼
 [ User-scoped Vector Search ]
 ```
 
@@ -301,11 +301,12 @@ Local embedding throughput bench-marked against text records:
 
 * **Model Framework:** `all-MiniLM-L6-v2` via SentenceTransformers & PyTorch
 * **Hardware Engine:** NVIDIA RTX 2050 (2048 CUDA Cores, Acceleration Enabled)
+* **Average words/note:** 60
 
 | Compute Configuration | Processing Throughput |
 | :--- | ---: |
-| Individual inference execution | ~50–70 notes/sec |
-| Vector batch mode streaming | ~700 notes/sec |
+| Individual inference execution | ~150 notes/sec |
+| Vector batch mode streaming | ~770 notes/sec |
 
 > *Note: Metrics reflect local configurations and fluctuate based on text size and hardware constraints.*
 
@@ -313,7 +314,7 @@ Local embedding throughput bench-marked against text records:
 
 Before setting up the project locally, ensure you have the following installed:
 * **Node.js** (v18+ recommended)
-* **Python 3.x**
+* **Python 3.11+**
 * **Firebase Project** (Firestore DB and Firebase Auth configured)
 * **NVIDIA GPU + CUDA** (Required for `all-MiniLM-L6-v2` GPU acceleration Otherwise Optional)
 
@@ -322,7 +323,7 @@ Before setting up the project locally, ensure you have the following installed:
 ### 1. Setup Environment & Clone
 ```bash
 # Clone the repository
-git clone https://github.com/FuzeIsHere/notes-app.git
+git clone https://github.com/FuzeIsHere/recall.git
 
 # Jump into project directory
 cd recall
@@ -399,16 +400,39 @@ python main.py
 
 ## 📐 Architectural Design Decisions
 
-* **Why Firestore DB & Vector Index?**  
-  Used to orchestrate a unified backend document ecosystem. The frontend uses debounced CRUD operations to interact with Firebase, allowing the system to listen to downstream cloud changes seamlessly.
-* **Why an Asynchronous Background Sync Pipeline?**  
-  To keep the main web app non-blocking, a dedicated **Firestore Listener Thread** listens for cloud updates and pipes them down through a **3-second Embedding Debounce** filter for job deduplication.
-* **Why a Min-Heap Priority Queue?**  
-  Pending deduplicated embedding tasks are pushed into a Min-Heap priority arrangement. Multiple dedicated multi-threaded compute instances (**Embedding Worker 1 & Worker 2**) pop jobs and batch-write computed vectors directly into the database.
-* **Why a Thread-Safe Search Queue?**  
-  To handle concurrent query requests securely. When a user requests text matching, queries pass along a verified Firebase Auth UID. They enter a dedicated **Thread-Safe Search Queue** inside a decoupled **Background Search Pipeline** where queries are sequentially dequeued by a specialized **Search Worker Thread**.
-* **Why `all-MiniLM-L6-v2` with CUDA?**  
-  Selected as the central token processing model to generate dense text vector metrics natively on the GPU, maximizing local similarity query performance.
+* **Why Firestore DB & Vector Index?**
+
+  Firestore provides a unified persistence layer for notes and their
+  corresponding embeddings, while its vector index enables semantic
+  similarity search without requiring a separate vector database.
+
+* **Why an Asynchronous Background Sync Pipeline?**
+
+  Embedding generation is decoupled from the note CRUD and search
+  request paths. A dedicated Firestore Listener Thread detects note
+  changes and passes them through a 3-second embedding debounce and
+  job-deduplication stage before they enter the processing queue.
+
+* **Why a Min-Heap Priority Queue?**
+
+  Pending embedding jobs are ordered by their next eligible execution
+  time using a Min-Heap. Multiple embedding workers can then retrieve
+  eligible jobs concurrently, generate their embeddings, and write the
+  resulting vectors back to Firestore.
+
+* **Why a Thread-Safe Search Queue?**
+
+  Search requests from multiple users are coordinated through a
+  thread-safe queue. After Firebase ID token verification, the trusted
+  user UID is attached to the query before it enters the background
+  search pipeline, ensuring that vector searches remain user-scoped.
+
+* **Why `all-MiniLM-L6-v2` with CUDA?**
+
+  `all-MiniLM-L6-v2` provides compact 384-dimensional dense vector representations
+  suitable for semantic similarity search. CUDA acceleration allows
+  embedding generation to be performed on the GPU, significantly
+  increasing throughput when processing notes and search queries.
 
 ## 🚀 Deployment
 
