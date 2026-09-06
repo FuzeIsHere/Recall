@@ -1,6 +1,25 @@
 # 🧠 Recall
 
+> Your thoughts, structured and searchable.
+
 #### A full-stack personal knowledge management application featuring GPU-accelerated semantic search and Firestore vector search.
+
+
+[![React](https://img.shields.io/badge/React-blue?logo=react&logoColor=white)](https://react.dev/)
+[![JavaScript](https://img.shields.io/badge/JavaScript-ES6%2B-yellow?logo=javascript&logoColor=black)](https://developer.mozilla.org/en-US/docs/Web/JavaScript)
+[![Zustand](https://img.shields.io/badge/State-Zustand-443E3E?logo=react&logoColor=white)](https://zustand.docs.pmnd.rs/)
+[![Tiptap](https://img.shields.io/badge/Editor-Tiptap-black?logo=tiptap&logoColor=white)](https://tiptap.dev/)
+[![Firebase](https://img.shields.io/badge/Firebase-Services-FFCA28?logo=firebase&logoColor=black)](https://firebase.google.com/)
+
+[![FastAPI](https://img.shields.io/badge/API-FastAPI-009688?logo=fastapi&logoColor=white)](https://fastapi.tiangolo.com/)
+[![Python](https://img.shields.io/badge/Python-3.11+-3776AB?logo=python&logoColor=white)](https://www.python.org/)
+[![PyTorch](https://img.shields.io/badge/ML-PyTorch-EE4C2C?logo=pytorch&logoColor=white)](https://pytorch.org/)
+[![CUDA](https://img.shields.io/badge/GPU-CUDA-76B900?logo=nvidia&logoColor=white)](https://developer.nvidia.com/cuda)
+[![Sentence Transformers](https://img.shields.io/badge/Embeddings-all--MiniLM--L6--v2-FFCC00?logo=huggingface&logoColor=black)](https://www.sbert.net/)
+
+[![Firebase Auth](https://img.shields.io/badge/Auth-Firebase%20Authentication-FFCA28?logo=firebase&logoColor=black)](https://firebase.google.com/docs/auth)
+[![Firestore](https://img.shields.io/badge/Database-Cloud%20Firestore-FFCA28?logo=firebase&logoColor=black)](https://firebase.google.com/docs/firestore)
+[![Vector Search](https://img.shields.io/badge/Search-Firestore%20Vector%20Search-FFCA28?logo=firebase&logoColor=black)](https://firebase.google.com/docs/firestore/vector-search)
 
 ## 📺 Screenshots
 
