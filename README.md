@@ -453,6 +453,7 @@ python main.py
 - Chunk-level embeddings for long notes
 - Improved search ranking
 - Additional note organization features
+- Redis queue for notes embedding sync
 
 ## 📄 License
 
