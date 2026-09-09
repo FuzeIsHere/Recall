@@ -43,11 +43,10 @@
 - [🔒 Authentication & Security](#-authentication--security)
 - [🚀 Performance](#-performance)
 - [📋 Prerequisites](#-prerequisites)
-- [⚙️ Installation & Local Development](#️-installation--local-development)
-- [🔐 Environment Variables](#-environment-variables)
-- [💼 Usage](#-usage)
+- [⚙️ 1. Clone & Environment Setup](#️-1-clone--environment-setup)
+- [🐳 2. Quick Start with Docker](#-2-quick-start-with-docker)
+- [💻 3. Manual Local Development](#-3-manual-local-development)
 - [📐 Architectural Design Decisions](#-architectural-design-decisions)
-- [🚀 Deployment](#-deployment)
 - [🔮 Future Improvements](#-future-improvements)
 - [📄 License](#-license)
 
@@ -331,89 +330,51 @@ Local embedding throughput bench-marked against text records:
 
 ## 📋 Prerequisites
 
-Before setting up the project locally, ensure you have the following installed:
-* **Node.js** (v18+ recommended)
-* **Python 3.11+**
-* **Firebase Project** (Firestore DB and Firebase Auth configured)
-* **NVIDIA GPU + CUDA** (Required for `all-MiniLM-L6-v2` GPU acceleration Otherwise Optional)
+Ensure you have Node.js (v18+), Python 3.11+, a Firebase Project, Docker Desktop, and optionally an NVIDIA GPU + CUDA for acceleration installed.
 
-## ⚙️ Installation & Local Development
+---
 
-### 1. Setup Environment & Clone
+## ⚙️ 1. Clone & Environment Setup
+
+### Step A: Clone the Repository
 ```bash
-# Clone the repository
-git clone https://github.com/FuzeIsHere/recall.git
-
-# Jump into project directory
+git clone https://github.com/FuzeIsHere/Recall.git
 cd recall
 ```
 
-### 2. Frontend Setup
-```bash
-# Navigate to the client directory
-cd client
+### Step B: Configure Environment Variables
+Create a `.env` file inside both the `client/` and `server/` directories by copying their respective `.env.example` files, then fill in your actual Firebase and API values.
 
-# Install client UI dependencies
+### Step C: Add Firebase Service Account Key
+Generate a new private key from your Firebase Console (Project Settings -> Service Accounts), rename it to `service-account-key.json`, and place it inside the `server/` directory.
+
+---
+
+## 🐳 2. Quick Start with Docker
+
+Run the containerized services from the root directory:
+```bash
+docker compose up --build -d
+```
+Access the **Client** at `http://localhost:3000` and the **Server** at `http://localhost:5000`. Stop the application using `docker compose down`.
+
+---
+
+## 💻 3. Manual Local Development
+
+### Frontend Setup
+```bash
+cd client
 pnpm install
-```
-
-### 3. Backend Setup
-```bash
-# Navigate to the server directory from the root
-cd ../server
-
-# Create a virtual environment
-python -m venv venv
-
-# Activate the virtual environment
-# On Windows:
-venv\Scripts\activate
-# On Linux/macOS:
-source venv/bin/activate
-
-# Install Engine/Backend dependencies
-pip install -r requirements.txt
-```
-
-## 🔐 Environment Variables
-
-Create `.env` files in their respective directories using the configurations below. **Never commit credentials, private keys, or service-account files to the repository.**
-
-### Frontend (`client/.env`)
-```env
-VITE_APP_NAME=Recall
-
-VITE_FIREBASE_API_KEY=your_firebase_api_key
-VITE_FIREBASE_AUTH_DOMAIN=your_firebase_auth_domain
-VITE_FIREBASE_PROJECT_ID=your_firebase_project_id
-VITE_FIREBASE_STORAGE_BUCKET=your_firebase_storage_bucket
-VITE_FIREBASE_MESSAGING_SENDER_ID=your_firebase_messaging_sender_id
-VITE_FIREBASE_APP_ID=your_firebase_app_id
-VITE_FIREBASE_MEASUREMENT_ID=your_firebase_measurement_id
-
-# Edit this in deployment
-VITE_SEARCH_API_URL=http://localhost:5000
-```
-
-### Backend (`server/.env`)
-```env
-# You will get this from your project in Firebase Console
-GOOGLE_APPLICATION_CREDENTIALS=./service-account-key.json
-```
-
-## 💼 Usage
-
-### Spin Up Client Workspace
-```bash
-cd client
 pnpm run dev
 ```
 
-### Launch Python Compute Engine & Servers
-The system runs via a FastAPI application server which spins up multiple dedicated background pipeline threads upon startup.
+### Backend Setup
 ```bash
-cd server
-# Ensure your virtual environment is active
+cd ../server
+python -m venv venv
+# Activate venv (venv\Scripts\activate on Windows or source venv/bin/activate on Linux/macOS)
+pip install -r requirements.txt
 python main.py
 ```
 
@@ -453,16 +414,6 @@ python main.py
   embedding generation to be performed on the GPU, significantly
   increasing throughput when processing notes and search queries.
 
-## 🚀 Deployment
-
-### Frontend
-* **React Frontend Application** is optimized for distribution to static infrastructure networks (e.g., Firebase Hosting, Vercel).
-
-### Backend
-* **Uvicorn ASGI Web Server & FastAPI Engine** require deployment to compute environments offering persistent multi-threading and NVIDIA GPU compute runtimes (e.g., RunPod, AWS EC2 with GPU instances, or customized Docker stacks).
-
-### Database & Auth
-* **Firebase Cloud Services** handles native persistent data pipelines via Firestore DB and user token verification via Firebase Auth.
 
 ---
 

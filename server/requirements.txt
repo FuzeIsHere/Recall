@@ -3,4 +3,3 @@ uvicorn
 python-dotenv
 firebase-admin
 sentence-transformers
-torch --index-url https://pytorch.org

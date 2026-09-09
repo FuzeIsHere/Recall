@@ -1,6 +1,11 @@
+# Ignore the virtual environment
+venv/
+.venv/
+service-account-key.json
 __pycache__/
 .vscode/
 .env
+.env.example
 .git
 .gitignore
 benchmark.py
